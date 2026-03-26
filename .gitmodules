@@ -1,0 +1,9 @@
+[submodule "lib/playwright-cli"]
+	path = lib/playwright-cli
+	url = https://github.com/snomiao/playwright-cli
+[submodule "lib/playwright-mcp"]
+	path = lib/playwright-mcp
+	url = https://github.com/snomiao/playwright-mcp
+[submodule "lib/playwright"]
+	path = lib/playwright
+	url = https://github.com/snomiao/playwright
