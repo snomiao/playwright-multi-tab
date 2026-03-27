@@ -55,6 +55,54 @@ You can find your token by clicking the extension icon in Chrome and copying the
 
 > **Important:** When the browser connects via the extension, a special connection page (`chrome-extension://.../connect.html`) opens as tab 0. **Do not close this tab** — it maintains the WebSocket relay between the CLI and the browser. Closing it will disconnect the session and all controlled tabs will become unresponsive.
 
+## Multi-Tab Usage
+
+Open a browser and control multiple tabs:
+
+```bash
+playwright-cli-multi-tab open --extension
+playwright-cli-multi-tab tab-new
+playwright-cli-multi-tab goto https://github.com
+playwright-cli-multi-tab tab-new
+playwright-cli-multi-tab goto https://wikipedia.org
+playwright-cli-multi-tab tab-list
+```
+
+Switch between tabs:
+
+```bash
+playwright-cli-multi-tab tab-select 1
+playwright-cli-multi-tab snapshot
+```
+
+## Multiple Sessions
+
+You can run multiple independent browser sessions at the same time using the `-s` flag. Each session has its own browser instance and isolated tab list.
+
+```bash
+# Open two separate browser sessions
+playwright-cli-multi-tab -s=browser1 open --extension
+playwright-cli-multi-tab -s=browser2 open --extension
+
+# Each session manages its own tabs independently
+playwright-cli-multi-tab -s=browser1 tab-new
+playwright-cli-multi-tab -s=browser1 goto https://github.com
+playwright-cli-multi-tab -s=browser1 tab-new
+playwright-cli-multi-tab -s=browser1 goto https://wikipedia.org
+
+playwright-cli-multi-tab -s=browser2 tab-new
+playwright-cli-multi-tab -s=browser2 goto https://rust-lang.org
+playwright-cli-multi-tab -s=browser2 tab-new
+playwright-cli-multi-tab -s=browser2 goto https://nodejs.org
+
+# List tabs per session — each shows only its own tabs
+playwright-cli-multi-tab -s=browser1 tab-list
+# → 1: GitHub, 2: Wikipedia
+
+playwright-cli-multi-tab -s=browser2 tab-list
+# → 1: Rust, 2: Node.js
+```
+
 ## License
 
 MIT
