@@ -10,7 +10,7 @@ Records a demo video of `playwright-cli-multi-tab` running inside a Docker Linux
 
 ## Setup
 
-Copy the required CLI files into this directory before building:
+Copy the required CLI files and extension into this directory before building:
 
 ```bash
 cp ../playwright-cli.js .
@@ -24,6 +24,10 @@ Then patch the extension auth token for demo (skips approval dialog):
 ```bash
 EXT_DIR=./extension-dist node patch-token.js
 ```
+
+> The build also applies two patches to playwright-core for extension mode compatibility:
+> - `patch-context.js` — fixes `newTab()` race condition in `context.js`
+> - `patch-cdp-relay.js` — fixes `Target.createTarget` in extension mode by using the extension's `createTab` command so new tabs are properly registered for CDP event forwarding
 
 ## Build & Run
 

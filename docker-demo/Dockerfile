@@ -28,6 +28,14 @@ RUN npx playwright install chromium
 COPY patch-exports.js ./
 RUN node patch-exports.js
 
+# Patch newTab() race condition in extension mode
+COPY patch-context.js ./
+RUN node patch-context.js
+
+# Patch cdpRelay.js to support Target.createTarget via extension createTab command
+COPY patch-cdp-relay.js ./
+RUN node patch-cdp-relay.js
+
 # Link CLI globally
 COPY playwright-cli.js ./
 RUN npm link
@@ -43,7 +51,7 @@ RUN EXT_DIR=/ext/dist node setup-extension.js
 # to return fixed token DEMO_FIXED_TOKEN_FOR_RECORDING
 
 # Wrapper: launches apt Chromium (arm64 native) with the extension always loaded
-RUN printf '#!/bin/bash\nexec /usr/bin/chromium --load-extension=/ext/dist --disable-extensions-except=/ext/dist --no-first-run --no-default-browser-check --no-sandbox --disable-setuid-sandbox --window-position=640,0 --window-size=640,800 "$@"\n' \
+RUN printf '#!/bin/bash\nexec /usr/bin/chromium --load-extension=/ext/dist --disable-extensions-except=/ext/dist --no-first-run --no-default-browser-check --no-sandbox --window-position=640,0 --window-size=640,800 "$@"\n' \
     > /usr/local/bin/chromium-demo && \
     chmod +x /usr/local/bin/chromium-demo
 

@@ -20,7 +20,10 @@ export DISPLAY
 echo "[record.sh] Starting fluxbox..."
 fluxbox -display "${DISPLAY}" 2>/dev/null &
 FLUXBOX_PID=$!
-sleep 1
+sleep 0.5
+# Dismiss fluxbox wallpaper error dialog before recording starts
+DISPLAY="${DISPLAY}" xdotool search --onlyvisible --name "xmessage" key Return 2>/dev/null || true
+sleep 0.5
 
 echo "[record.sh] Starting ffmpeg (${SCREEN_W}x${SCREEN_H} @ 30fps) -> ${OUTPUT_DIR}/screen-recording.mp4"
 ffmpeg -y \

@@ -1,2 +1,6 @@
 .playwright-cli/
 tmp/
+.env.local
+tmp/docker-demo/narration/
+docker-demo/narration/
+docker-demo/extension-dist/
