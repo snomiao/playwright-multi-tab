@@ -32,7 +32,7 @@ The demo script is **narration-driven**: every section waits exactly as long as 
   | **FLUX.1.1 Pro** | Highest technical quality / realism |
   | Google `gemini-3-pro-image-preview` (template default) | Single-key convenience with TTS above |
 
-  The template ships with the **Gemini** variants because both modalities live behind one key. To switch providers, swap the request body in `generate-narration.py` and/or `generate-thumbnail.py` — the surrounding pipeline (PCM→WAV, durations, post-mix) is provider-agnostic.
+  See [`MODEL_REFERENCES.md`](./MODEL_REFERENCES.md) for source links and a fuller landscape (Azure, Polly, Midjourney, FLUX, Firefly, etc.). The template ships with the **Gemini** variants because both modalities live behind one key. To switch providers, swap the request body in `generate-narration.py` and/or `generate-thumbnail.py` — the surrounding pipeline (PCM→WAV, durations, post-mix) is provider-agnostic.
 
   ```bash
   # Gemini (template default — get key at https://aistudio.google.com/apikey)
