@@ -11,6 +11,22 @@ Produce a polished MP4 demo video for a CLI tool using a 2-pass pipeline:
 
 The demo script is **narration-driven**: every section waits exactly as long as its TTS audio clip, so audio and video stay in sync without any runtime audio playback.
 
+## Prerequisites
+
+- **An LLM provider API key (required)** — for TTS narration *and* thumbnail image generation. The shipped template uses **Gemini** (`gemini-2.5-flash-preview-tts` for audio, `gemini-3-pro-image-preview` for thumbnails) because both modalities live behind a single key, but **OpenAI** is an equally valid alternative (`gpt-4o-mini-tts` / `tts-1` for audio, `gpt-image-1` / DALL·E for thumbnails) — swap the request bodies in `generate-narration.py` and `generate-thumbnail.py` if you prefer it. Quality matters here: a low-tier or free TTS will make the final video sound robotic, so use a current production model from one of these providers.
+
+  ```bash
+  # Gemini (default — get key at https://aistudio.google.com/apikey)
+  echo 'GOOGLE_GENERATIVE_AI_API_KEY=your-key-here' > .env.local
+
+  # …or OpenAI (requires editing the two scripts to call the OpenAI endpoints)
+  echo 'OPENAI_API_KEY=your-key-here' > .env.local
+  ```
+
+- **Docker** — for the recording environment (Xvfb + ffmpeg + Chromium).
+- **Python 3** with `requests` — for narration/thumbnail generation on the host.
+- **(Optional) `client_secret.json`** in the same dir as `youtube_upload.py` — only needed if you want to auto-upload. Get it from Google Cloud Console → OAuth client (Desktop type) with YouTube Data API v3 enabled.
+
 ## Pipeline Overview
 
 ```
@@ -250,10 +266,56 @@ python3 generate-thumbnail.py
 ffmpeg [concat command above] output/final.mp4
 ```
 
-## Reference Implementation
+## Reference Implementation — Self-Contained Template
 
-See `docker-demo/` in this repo for a complete working example covering:
-- Chrome extension relay connection
-- Multi-tab navigation
-- Independent browser sessions
-- ~161 seconds, 20 narration segments, 2:44 final video
+The complete working pipeline lives in `template/` next to this file. To use this skill in a **brand new repo**:
+
+```bash
+# 1. Copy the template into your repo
+cp -r path/to/skills/record-demo-video/template my-demo
+cd my-demo
+
+# 2. Set your API key (used by generate-narration.py and generate-thumbnail.py)
+echo 'GOOGLE_GENERATIVE_AI_API_KEY=...' > .env.local
+
+# 3. Edit SEGMENTS in generate-narration.py to describe YOUR tool
+$EDITOR generate-narration.py
+
+# 4. Edit demo.sh to perform YOUR visual actions, using the
+#    narrate "<segment_name>" "<log msg>" / narrate_end pattern.
+#    Segment names MUST match SEGMENTS keys exactly.
+$EDITOR demo.sh
+
+# 5. Adjust Dockerfile to install YOUR CLI/binary instead of playwright-cli-multi-tab
+
+# 6. Generate narration audio (cached; idempotent)
+python3 generate-narration.py
+
+# 7. Build and record
+docker build -t my-demo .
+mkdir -p output
+docker run --rm -v "$(pwd)/output:/output" my-demo
+# → output/screen-recording-final.mp4
+
+# 8. (Optional) Upload to YouTube
+python3 youtube_upload.py output/screen-recording-final.mp4
+```
+
+### Files in `template/`
+
+| File | Purpose | Edit per project? |
+|---|---|---|
+| `generate-narration.py` | Gemini TTS → wav segments + `durations.sh` + `meta.json` + concatenated track | **Yes** — edit `SEGMENTS` |
+| `demo.sh` | Narration-driven CLI demo script with `narrate()`/`narrate_end()` helpers | **Yes** — edit visual actions |
+| `record.sh` | Xvfb + ffmpeg recorder + post-mix (audio overlay + subtitle burn-in) | Rarely |
+| `Dockerfile` | Recording environment (Xvfb, fluxbox, xterm, chromium, ffmpeg) | **Yes** — install your tool |
+| `generate-thumbnail.py` | Gemini image gen → `thumbnail.jpg` (16:9) | **Yes** — edit `PROMPT` |
+| `youtube_upload.py` | OAuth + resumable upload to YouTube (Unlisted by default) | Rarely (provide `client_secret.json`) |
+
+### What is **NOT** parameterized
+
+`demo.sh` and `Dockerfile` in the template are the **playwright-multi-tab** versions (Chrome extension relay, multi-tab navigation, etc.). They are intended as a worked reference, not a generic harness — you will replace the visual-action body of `demo.sh` and the tool install steps in `Dockerfile`. Everything else (timing helpers, post-mix, subtitle burn-in, TTS generation, upload) is project-agnostic.
+
+### Reference run
+
+The template as-shipped produces: ~161 seconds, 20 narration segments, 2:44 final video — see [https://youtu.be/HnVxBG7P7S4](https://youtu.be/HnVxBG7P7S4).
