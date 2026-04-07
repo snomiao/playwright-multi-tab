@@ -13,14 +13,36 @@ The demo script is **narration-driven**: every section waits exactly as long as 
 
 ## Prerequisites
 
-- **An LLM provider API key (required)** — for TTS narration *and* thumbnail image generation. The shipped template uses **Gemini** (`gemini-2.5-flash-preview-tts` for audio, `gemini-3-pro-image-preview` for thumbnails) because both modalities live behind a single key, but **OpenAI** is an equally valid alternative (`gpt-4o-mini-tts` / `tts-1` for audio, `gpt-image-1` / DALL·E for thumbnails) — swap the request bodies in `generate-narration.py` and `generate-thumbnail.py` if you prefer it. Quality matters here: a low-tier or free TTS will make the final video sound robotic, so use a current production model from one of these providers.
+- **An LLM provider API key (required)** — for TTS narration *and* thumbnail image generation. Quality matters: a low-tier or free TTS will make the final video sound robotic. As of 2026, the realistic options are:
+
+  **Text-to-Speech**
+
+  | Provider · Model | Strength | Best for |
+  |---|---|---|
+  | **ElevenLabs Eleven v3** | Most expressive; audio tags, dialogue mode, 70+ languages | Top voice quality (recommended for polished demos) |
+  | **OpenAI `gpt-4o-mini-tts`** | Natural-language style instructions, streaming, simple API | Fast prototyping, developer DX |
+  | **Google Gemini 2.5 TTS** (template default) | Style/accent/pace/emotion via prompt; one key shared with image gen | Single-vendor convenience |
+
+  **Thumbnail image generation**
+
+  | Provider · Model | Strength |
+  |---|---|
+  | **OpenAI GPT Image 1.5** | Photorealism, replaces DALL-E 3 |
+  | **Google Imagen 3** | Best in-image text rendering (titles, labels) |
+  | **FLUX.1.1 Pro** | Highest technical quality / realism |
+  | Google `gemini-3-pro-image-preview` (template default) | Single-key convenience with TTS above |
+
+  The template ships with the **Gemini** variants because both modalities live behind one key. To switch providers, swap the request body in `generate-narration.py` and/or `generate-thumbnail.py` — the surrounding pipeline (PCM→WAV, durations, post-mix) is provider-agnostic.
 
   ```bash
-  # Gemini (default — get key at https://aistudio.google.com/apikey)
+  # Gemini (template default — get key at https://aistudio.google.com/apikey)
   echo 'GOOGLE_GENERATIVE_AI_API_KEY=your-key-here' > .env.local
 
-  # …or OpenAI (requires editing the two scripts to call the OpenAI endpoints)
+  # …or OpenAI (edit the two scripts to call the OpenAI endpoints)
   echo 'OPENAI_API_KEY=your-key-here' > .env.local
+
+  # …or ElevenLabs (TTS only — pair with one of the image providers above)
+  echo 'ELEVENLABS_API_KEY=your-key-here' > .env.local
   ```
 
 - **Docker** — for the recording environment (Xvfb + ffmpeg + Chromium).
