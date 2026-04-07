@@ -1,5 +1,9 @@
 # playwright-multi-tab
 
+[![Demo video](https://img.youtube.com/vi/HnVxBG7P7S4/maxresdefault.jpg)](https://youtu.be/HnVxBG7P7S4)
+
+▶️ **[Watch the demo on YouTube](https://youtu.be/HnVxBG7P7S4)**
+
 A fork of [Playwright](https://playwright.dev/) with multi-tab support. This monorepo aggregates patched versions of Playwright core, the Playwright CLI, and the Playwright MCP extension so that an AI agent (or human) can open and control multiple browser tabs in a single session.
 
 ## Submodules
