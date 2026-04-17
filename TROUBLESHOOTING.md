@@ -23,16 +23,28 @@ playwright-cli-multi-tab open --extension
 ## `ERR_PACKAGE_PATH_NOT_EXPORTED`
 
 ```
-Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './lib/cli/client/program' is not defined by "exports"
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './lib/tools/cli-client/cli' is not defined by "exports"
 ```
 
-This means the CLI is using the npm-installed `playwright` package instead of the locally built one. Re-link the local packages:
+This means `lib/playwright-cli` is still resolving the npm-installed `playwright`/`playwright-core` packages instead of the locally built fork. Re-link the local packages:
 
 ```bash
 (cd lib/playwright/packages/playwright-core && npm link)
 (cd lib/playwright/packages/playwright && npm link)
 (cd lib/playwright-cli && npm link playwright-core playwright)
 (cd lib/playwright-cli && npm link)
+```
+
+You can confirm the CLI resolves the local fork with:
+
+```bash
+(cd lib/playwright-cli && node -p "require.resolve('playwright-core/package.json')")
+```
+
+Expected output:
+
+```text
+.../lib/playwright/packages/playwright-core/package.json
 ```
 
 ## CLI connects to the official extension instead of the custom one

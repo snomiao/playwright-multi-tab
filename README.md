@@ -19,12 +19,17 @@ A fork of [Playwright](https://playwright.dev/) with multi-tab support. This mon
 ```bash
 # Clone with submodules
 git clone --recurse-submodules https://github.com/snomiao/playwright-multi-tab.git
-cd playwright-multi-tab/tree/main
+cd playwright-multi-tab
 
 # Install and build
 (cd lib/playwright && npm install && npm run build)
 (cd lib/playwright-mcp && npm install && npm run build)
 (cd lib/playwright-cli && npm install)
+
+# Link the local Playwright fork into the CLI
+(cd lib/playwright/packages/playwright-core && npm link)
+(cd lib/playwright/packages/playwright && npm link)
+(cd lib/playwright-cli && npm link playwright-core playwright)
 
 # Link the CLI globally
 (cd lib/playwright-cli && npm link)
