@@ -35,8 +35,12 @@ cd playwright-multi-tab
 (cd lib/playwright-cli && npm link)
 
 # Verify
+(cd lib/playwright-cli && node -p "require.resolve('playwright-core/package.json')")
+# → .../lib/playwright/packages/playwright-core/package.json (the local fork)
 playwright-cli-multi-tab --help
 ```
+
+If `--help` errors with `ERR_PACKAGE_PATH_NOT_EXPORTED` or prints nothing, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Browser Extension
 

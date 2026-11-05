@@ -47,6 +47,18 @@ Expected output:
 .../lib/playwright/packages/playwright-core/package.json
 ```
 
+## `playwright-cli-multi-tab --help` prints nothing
+
+The command exits 0 with no output. The `lib/playwright-cli` submodule is on an
+old commit whose entrypoint loads `playwright-core/lib/tools/cli-client/program`
+but never calls `program()`. Update the submodules and re-run the Quick Start:
+
+```bash
+git pull
+git submodule update --init --recursive
+(cd lib/playwright-cli && npm install && npm link)
+```
+
 ## CLI connects to the official extension instead of the custom one
 
 If the browser opens `chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/...` (official extension ID), the local playwright build is not being used. Follow the re-linking steps above to ensure the CLI resolves to the patched `playwright-core`.
